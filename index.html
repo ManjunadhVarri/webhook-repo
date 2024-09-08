@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webhook Events</title>
+    <script>
+        function fetchEvents() {
+            fetch('/events')
+                .then(response => response.json())
+                .then(data => {
+                    let eventList = document.getElementById('event-list');
+                    eventList.innerHTML = '';
+                    data.forEach(event => {
+                        let li = document.createElement('li');
+                        li.textContent = event.message;
+                        eventList.appendChild(li);
+                    });
+                });
+        }
+
+        setInterval(fetchEvents, 15000);  // Poll every 15 seconds
+    </script>
+</head>
+<body>
+    <h1>Webhook Events</h1>
+    <ul id="event-list"></ul>
+</body>
+</html>
