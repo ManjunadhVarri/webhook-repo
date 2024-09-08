@@ -24,28 +24,24 @@ def receiver():
     event_header = request.headers.get('X-GitHub-Event')
     print("GitHub Event Header:", event_header)  # Debug print for event header
 
+    timestamp = datetime.now().strftime('%d %B %Y - %I:%M %p UTC')
+
     if event_header == 'push':
         author = data.get('pusher', {}).get('name', 'Unknown')
         to_branch = data.get('ref', '').split('/')[-1]
-        timestamp = datetime.now().strftime('%d %B %Y - %I:%M %p UTC')
-        event_type = 'push'
-        message = f'{author} pushed to {to_branch} on {timestamp}'
-
+        message = f'"{author}" pushed to "{to_branch}" on {timestamp}'
+    
     elif event_header == 'pull_request':
         author = data.get('pull_request', {}).get('user', {}).get('login', 'Unknown')
         from_branch = data.get('pull_request', {}).get('head', {}).get('ref', 'Unknown')
         to_branch = data.get('pull_request', {}).get('base', {}).get('ref', 'Unknown')
-        timestamp = datetime.now().strftime('%d %B %Y - %I:%M %p UTC')
-        event_type = 'pull_request'
-        message = f'{author} submitted a pull request from {from_branch} to {to_branch} on {timestamp}'
+        message = f'"{author}" submitted a pull request from "{from_branch}" to "{to_branch}" on {timestamp}'
 
     elif event_header == 'pull_request_review' and data.get('action') == 'closed' and data.get('pull_request', {}).get('merged'):
         author = data.get('pull_request', {}).get('user', {}).get('login', 'Unknown')
         from_branch = data.get('pull_request', {}).get('head', {}).get('ref', 'Unknown')
         to_branch = data.get('pull_request', {}).get('base', {}).get('ref', 'Unknown')
-        timestamp = datetime.now().strftime('%d %B %Y - %I:%M %p UTC')
-        event_type = 'merge'
-        message = f'{author} merged branch {from_branch} to {to_branch} on {timestamp}'
+        message = f'"{author}" merged branch "{from_branch}" to "{to_branch}" on {timestamp}'
 
     # If a message was constructed, save to MongoDB
     if message:
@@ -54,7 +50,7 @@ def receiver():
                 'author': author,
                 'to_branch': to_branch,
                 'timestamp': datetime.utcnow().strftime('%d %B %Y - %I:%M %p UTC'),
-                'event_type': event_type,
+                'event_type': event_header,
                 'message': message
             })
             return {'message': message}, 200
