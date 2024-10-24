@@ -1,4 +1,4 @@
-# Dev Assessment - Webhook Receiver
+# Webhook Receiver
 
 Please use this repository for constructing the Flask webhook receiver.
 
